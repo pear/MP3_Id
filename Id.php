@@ -975,5 +975,3 @@ class MP3_Id {
 } // end of id3
 
 ?>
-
-
