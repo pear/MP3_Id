@@ -29,17 +29,17 @@
 // Tip: make sure you use a <PRE> block so the print_r's are readable.
 // define('ID3_SHOW_DEBUG', true);
 
-require_one "PEAR.php" ;
+require_once "PEAR.php" ;
 
 /**
 * File not opened
-* @const PEAR_MP3_ID_FNO 
+* @const PEAR_MP3_ID_FNO
 */
 define('PEAR_MP3_ID_FNO', 1);
 
 /**
 * Read error
-* @const PEAR_MP3_ID_RE 
+* @const PEAR_MP3_ID_RE
 */
 define('PEAR_MP3_ID_RE', 2);
 
