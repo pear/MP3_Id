@@ -379,7 +379,7 @@ class MP3_Id {
      * @param boolean   $id3v1  true to remove the tag
      * @param boolean   $id3v2  true to remove the tag (Not yet implemented)
      *
-     * @access public     
+     * @access public
      */
     function remove($id3v1 = true, $id3v2 = true) {
     if ($this->debug) print($this->debugbeg . "remove()<HR>\n");
@@ -409,11 +409,11 @@ class MP3_Id {
     if ($this->debug) print($this->debugbeg . "_read_v1()<HR>\n");
 
     if (! ($f = @fopen($this->file, 'rb')) ) {
-        return PEAR::raiseError( "Unable to open " . $file, PEAR_MP3_ID_FNO);
+        return PEAR::raiseError( "Unable to open " . $this->file, PEAR_MP3_ID_FNO);
     }
 
     if (fseek($f, -128, SEEK_END) == -1) {
-        return PEAR::raiseError( 'Unable to see to end - 128 of ' . $file, PEAR_MP3_ID_RE);
+        return PEAR::raiseError( 'Unable to see to end - 128 of ' . $this->file, PEAR_MP3_ID_RE);
     }
 
     $r = fread($f, 128);
