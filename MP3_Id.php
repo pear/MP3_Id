@@ -29,6 +29,16 @@
 // Tip: make sure you use a <PRE> block so the print_r's are readable.
 // define('ID3_SHOW_DEBUG', true);
 
+include "PEAR.php" ;
+
+  $id3 = new MP3_id();
+  if( PEAR::isError($t = $id3-> read('g:/musikmp3/n.txt'))) echo "hilfe" ;
+  print_r( $t) ;
+//  $id3->setField('artists', "Heino");
+//  echo $id3->getField('artists');
+//  $id3->write() ;
+
+
 /**
  * A Class for reading/writing MP3 ID3 tags
  * 
@@ -235,19 +245,74 @@ class MP3_Id {
      *                          slow this down.
      * @access public
      */
-    function MP3_Id($file, $study = false) {
-    if (defined('ID3_SHOW_DEBUG')) $this->debug = true;
-    if ($this->debug) print($this->debugbeg . "id3('$file')<HR>\n");
+    function MP3_Id($study = false) {
+        if (defined('ID3_SHOW_DEBUG')) $this->debug = true;    
+        if ($study or defined('ID3_AUTO_STUDY'))
+            $this->study();
+    
+    } // id3()
 
-    $this->file = $file;
-    $this->_read_v1();
-
-    if ($study or defined('ID3_AUTO_STUDY'))
-        $this->study();
-
-    if ($this->debug) print($this->debugend);
-    } // id3($file)
-
+    /**
+    * reads the given file and parse it
+    *
+    * @param    string  $file the name of the file to parse
+    * @return   mixed   PEAR_Error on error
+    * @access   public
+    */
+    function read( $file) {
+        if ($this->debug) print($this->debugbeg . "id3('$file')<HR>\n");
+        
+        $this->file = $file;
+        if ($this->debug) print($this->debugend);        
+        
+        return $this->_read_v1();                        
+    }
+    
+    /**
+    * sets a field
+    * 
+    * possible names of fields are:
+    * artists   - Name of band or artist
+    * album     - Name of the album
+    * year      - publishing year of the album or song
+    * comment   - song comment
+    * track     - the number of the track
+    * genre     - genre of the song
+    * genreno   - Number of the genre
+    *
+    * @param    mixed   $name   Name of the field to set or hash with the key as fieldname
+    * @param    mixed   $value  the value to set 
+    *
+    * @access   public
+    */
+    function setField($name, $value) {
+        if( is_array($name)) {
+            foreach( $name as $n => $v) {
+                $this -> $n = $v ;
+                }
+        } else {
+            $this -> $name = $value ;        
+        }
+    }
+    
+    /**
+    * get the value of a field
+    * 
+    * @param    string  $name       the name of the field to get
+    * @param    mixed   $default    returned if the field not exists
+    * 
+    * @return   mixed   The value of the field
+    * @access   public 
+    * @see      setField
+    */
+    function getField($name, $default = 0) {
+        if(empty($this -> $name)) {
+            return $default ;
+        } else {
+            return $this -> $name ;
+        }
+    }        
+    
     /*
      * update the id3v1 tags on the file.
      * Note: If/when ID3v2 is implemented this method will probably get another
@@ -322,20 +387,19 @@ class MP3_Id {
      * $file should be the path to the mp3 to look for a tag.
      * When in doubt use the full path.
      *
-     * if there is an error it will return false and a message will be
-     * put in $this->error
+     * @return mixed    PEAR_Error if fails
      */
     function _read_v1() {
     if ($this->debug) print($this->debugbeg . "_read_v1()<HR>\n");
 
-    if (! ($f = fopen($this->file, 'rb')) ) {
-        $this->error = 'Unable to open ' . $file;
-        return false;
+    if (! ($f = @fopen($this->file, 'rb')) ) {
+//        $this->error = 'Unable to open ' . $file;
+        return new PEAR_Error( "Unable to open " . $file);
     }
 
     if (fseek($f, -128, SEEK_END) == -1) {
-        $this->error = 'Unable to see to end - 128 of ' . $file;
-        return false;
+//        $this->error = 'Unable to see to end - 128 of ' . $file;
+        return new PEAR_Error( 'Unable to see to end - 128 of ' . $file);
     }
 
     $r = fread($f, 128);
@@ -348,7 +412,7 @@ class MP3_Id {
 
     $id3tag = $this->_decode_v1($r);
 
-    if($id3tag) {
+    if(!PEAR::isError( $id3tag)) {
         $this->id3v1 = true;
 
         $tmp = explode(Chr(0), $id3tag['NAME']);
@@ -373,7 +437,9 @@ class MP3_Id {
 
         $this->genreno = $id3tag['GENRENO'];
         $this->genre = $id3tag['GENRE'];
-    }
+    } else {
+        return $id3tag ;
+        }
 
     if ($this->debug) print($this->debugend);
     } // _read_v1()
@@ -404,8 +470,8 @@ class MP3_Id {
     if ($id3tag['TAG'] == 'TAG') {
         $id3tag['GENRE'] = $this->getgenre($id3tag['GENRENO']);
     } else {
-        $this->error = 'TAG not found';
-        $id3tag = false;
+//        $this->error = 'TAG not found';
+        $id3tag = new PEAR_Error( 'TAG not found');
     }
     if ($this->debug) print($this->debugend);
     return $id3tag;
@@ -423,14 +489,14 @@ class MP3_Id {
 
     $file = $this->file;
 
-    if (! ($f = fopen($file, 'r+b')) ) {
-        $this->error = 'Unable to open ' . $file;
-        return false;
+    if (! ($f = @fopen($file, 'r+b')) ) {
+//        $this->error = 'Unable to open ' . $file;
+        return new PEAR_Error( "Unable to open " . $file);
     }
 
     if (fseek($f, -128, SEEK_END) == -1) {
-        $this->error = 'Unable to see to end - 128 of ' . $file;
-        return false;
+//        $this->error = 'Unable to see to end - 128 of ' . $file;
+        return new PEAR_Error( "Unable to see to end - 128 of " . $file);
     }
 
     $this->genreno = $this->getgenreno($this->genre, $this->genreno);
@@ -439,16 +505,16 @@ class MP3_Id {
 
     $r = fread($f, 128);
 
-    if ($this->_decode_v1($r)) {
+    if ( !PEAR::isError( $this->_decode_v1($r))) {
         if (fseek($f, -128, SEEK_END) == -1) {
-        $this->error = 'Unable to see to end - 128 of ' . $file;
-        return false;
+//        $this->error = 'Unable to see to end - 128 of ' . $file;
+        return new PEAR_Error( "Unable to see to end - 128 of " . $file);
         }
         fwrite($f, $newtag);
     } else {
         if (fseek($f, 0, SEEK_END) == -1) {
-        $this->error = 'Unable to see to end of ' . $file;
-        return false;
+//        $this->error = 'Unable to see to end of ' . $file;
+        return new PEAR_Error( "Unable to see to end of " . $file);
         }
         fwrite($f, $newtag);
     }
@@ -519,19 +585,19 @@ class MP3_Id {
     $file = $this->file;
 
     if (! ($f = fopen($file, 'r+b')) ) {
-        $this->error = 'Unable to open ' . $file;
-        return false;
+//        $this->error = 'Unable to open ' . $file;
+        return new PEAR_Error( "Unable to open " . $file);
     }
 
     if (fseek($f, -128, SEEK_END) == -1) {
-        $this->error = 'Unable to see to end - 128 of ' . $file;
-        return false;
+//        $this->error = 'Unable to see to end - 128 of ' . $file;
+        return new PEAR_Error( 'Unable to see to end - 128 of ' . $file);
     }
 
     $r = fread($f, 128);
 
     $success = false;
-    if ($this->_decode_v1($r)) {
+    if ( !PEAR::isError( $this->_decode_v1($r))) {
         $size = filesize($this->file) - 128;
         if ($this->debug) print('size: old: ' . filesize($this->file));
         $success = ftruncate($f, $size);    
@@ -554,9 +620,9 @@ class MP3_Id {
     $file = $this->file;
 
     if (! ($f = fopen($file, 'rb')) ) {
-        $this->error = 'Unable to open ' . $file;
+//        $this->error = 'Unable to open ' . $file;
         if ($this->debug) print($this->debugend);
-        return false;
+        return new PEAR_Error( "Unable to open " . $file) ;
     }
 
     $this->filesize = filesize($file);
@@ -565,9 +631,9 @@ class MP3_Id {
         while (fread($f,1) != Chr(255)) { // Find the first frame
         //if ($this->debug) echo "Find...\n";
         if (feof($f)) {
-            $this->error = 'No mpeg frame found';
+//            $this->error = 'No mpeg frame found';
             if ($this->debug) print($this->debugend);
-            return false;
+            return PEAR_Error( "No mpeg frame found") ;
         }
         }
         fseek($f, ftell($f) - 1); // back up one byte
