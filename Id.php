@@ -29,7 +29,7 @@
 // Tip: make sure you use a <PRE> block so the print_r's are readable.
 // define('ID3_SHOW_DEBUG', true);
 
-include "PEAR.php" ;
+require_one "PEAR.php" ;
 
 /**
 * File not opened
