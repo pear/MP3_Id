@@ -263,7 +263,7 @@ class MP3_Id {
     /**
     * sets a field
     * 
-    * possible names of fields are:
+    * possible names of tags are:
     * artists   - Name of band or artist
     * album     - Name of the album
     * year      - publishing year of the album or song
@@ -272,12 +272,12 @@ class MP3_Id {
     * genre     - genre of the song
     * genreno   - Number of the genre
     *
-    * @param    mixed   $name   Name of the field to set or hash with the key as fieldname
+    * @param    mixed   $name   Name of the tag to set or hash with the key as fieldname
     * @param    mixed   $value  the value to set 
     *
     * @access   public
     */
-    function setField($name, $value) {
+    function setTag($name, $value) {
         if( is_array($name)) {
             foreach( $name as $n => $v) {
                 $this -> $n = $v ;
@@ -288,16 +288,16 @@ class MP3_Id {
     }
     
     /**
-    * get the value of a field
+    * get the value of a tag
     * 
     * @param    string  $name       the name of the field to get
     * @param    mixed   $default    returned if the field not exists
     * 
     * @return   mixed   The value of the field
     * @access   public 
-    * @see      setField
+    * @see      setTag
     */
-    function getField($name, $default = 0) {
+    function getTag($name, $default = 0) {
         if(empty($this -> $name)) {
             return $default ;
         } else {
