@@ -39,13 +39,8 @@
       <date>2004-04-21</date>
       <state>stable</state>
       <notes>
-       Fixed bug #774&1220 (require_once)
+       Fixed bug #774&amp;1220 (require_once)
       </notes>
-      <filelist>
-       <dir name="/" baseinstalldir="MP3">
-        <file role="php">Id.php</file>
-       </dir>
-      </filelist>
     </release>
 
     <release>
@@ -56,11 +51,6 @@
        Fixed bug #1116 (fix error message text)
        (thanks to pear at trullala dot de)
       </notes>
-      <filelist>
-       <dir name="/" baseinstalldir="MP3">
-        <file role="php">Id.php</file>
-       </dir>
-      </filelist>
     </release>
 
     <release>
