@@ -31,14 +31,6 @@
 
 include "PEAR.php" ;
 
-  $id3 = new MP3_id();
-  if( PEAR::isError($t = $id3-> read('g:/musikmp3/n.txt'))) echo "hilfe" ;
-  print_r( $t) ;
-//  $id3->setField('artists', "Heino");
-//  echo $id3->getField('artists');
-//  $id3->write() ;
-
-
 /**
  * A Class for reading/writing MP3 ID3 tags
  * 
@@ -481,8 +473,7 @@ class MP3_Id {
     /*
      * writes a ID3 v1 or v1.1 tag to a file
      *
-     * if there is an error it will return false and a message will be
-     * put in $this->error
+     * @return mixed    returns PEAR_Error when fails
      */
     function _write_v1() {
     if ($this->debug) print($this->debugbeg . "_write_v1()<HR>\n");
@@ -612,7 +603,7 @@ class MP3_Id {
     /**
     * reads a frame from the file
     *
-    * @return mixed false if fails
+    * @return mixed PEAR_Error when fails
     */
     function _readframe() {
     if ($this->debug) print($this->debugbeg . "_readframe()<HR>\n");
