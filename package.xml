@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<package>
+<!DOCTYPE package SYSTEM "../package.dtd">
+<package version="1.0">
   <name>MP3_Id</name>
   <summary>The PEAR::MP3_Id class provides methods for reading and writing information tags of MP3 files.</summary>
-  <maintainer>
-    <user>alexmerz</user>
-    <name>Alexander Merz</name>
-    <email>alexmerz@php.net</email>
-  </maintainer>
+  <maintainers>
+    <maintainer>
+      <user>alexmerz</user>
+      <name>Alexander Merz</name>
+      <email>alexmerz@php.net</email>
+    </maintainer>
+  </maintainers>
   <release>
     <version>0.9</version>
     <date>2001-10-15</date>
@@ -14,11 +17,10 @@
       All should work normally, if the mp3 file is corrupted, bugs caused by
       errorhandling are possible 
     </notes>
-  </release>
-
-  <filelist>
-    <dir name="/" baseinstalldir="MP3">
+    <filelist>
+      <dir name="/" baseinstalldir="MP3">
         <file role="php">MP3_Id.php</file>
-    </dir>
-  </filelist>
+      </dir>
+    </filelist>
+  </release>
 </package>
