@@ -33,25 +33,25 @@ include "PEAR.php" ;
 
 /**
 * File not opened
-* @define PEAR_MP3_ID_FNO 1
+* @const PEAR_MP3_ID_FNO 
 */
 define('PEAR_MP3_ID_FNO', 1);
 
 /**
 * Read error
-* @define PEAR_MP3_ID_RE 2
+* @const PEAR_MP3_ID_RE 
 */
 define('PEAR_MP3_ID_RE', 2);
 
 /**
 * Tag not found
-* @define PEAR_MP3_ID_TNF 3
+* @const PEAR_MP3_ID_TNF 
 */
 define('PEAR_MP3_ID_TNF', 3);
 
 /**
 * File is not a MP3 file (corrupted?)
-* @define PEAR_MP3_ID_NOMP3 4
+* @const PEAR_MP3_ID_NOMP3 
 */
 define('PEAR_MP3_ID_NOMP3', 4);
 
@@ -77,7 +77,7 @@ define('PEAR_MP3_ID_NOMP3', 4);
  * $id3->read($file);
  * print_r($id3 );
  * 
- * @package MP3
+ * @package MP3_Id
  * @author Sandy McArthur Jr. <Leknor@Leknor.com>
  * @version $Version$
  */
@@ -152,7 +152,7 @@ class MP3_Id {
     * @var boolean
     */
     var $studied = false;
-    /**
+    **
     * version of mpeg
     * @var integer
     */    
@@ -328,7 +328,7 @@ class MP3_Id {
         }
     }        
     
-    /*
+    /**
      * update the id3v1 tags on the file.
      * Note: If/when ID3v2 is implemented this method will probably get another
      *       parameters.
@@ -345,7 +345,7 @@ class MP3_Id {
     if ($this->debug) print($this->debugend);
     } // write()
 
-    /*
+    /**
      * study() - does extra work to get the MPEG frame info.
      * 
      * @access public
@@ -355,10 +355,11 @@ class MP3_Id {
     $this->_readframe();
     } // study()
 
-    /*
+    /**
      * copy($from) - set's the ID3 fields to the same as the fields in $from
      * 
      * @param string    $from   fields to copy
+     * @access public
      */
     function copy($from) {
     if ($this->debug) print($this->debugbeg . "copy(\$from)<HR>\n");
@@ -373,13 +374,13 @@ class MP3_Id {
     if ($this->debug) print($this->debugend);
     } // copy($from)
 
-    /*
+    /**
      * remove - removes the id3 tag(s) from a file.
      *
      * @param boolean   $id3v1  true to remove the tag
      * @param boolean   $id3v2  true to remove the tag (Not yet implemented)
      *
-     * @access public
+     * @access public     
      */
     function remove($id3v1 = true, $id3v2 = true) {
     if ($this->debug) print($this->debugbeg . "remove()<HR>\n");
@@ -396,13 +397,14 @@ class MP3_Id {
     } // remove
 
 
-    /*
+    /**
      * read a ID3 v1 or v1.1 tag from a file
      *
      * $file should be the path to the mp3 to look for a tag.
      * When in doubt use the full path.
      *
      * @return mixed    PEAR_Error if fails
+     * @access private
      */
     function _read_v1() {
     if ($this->debug) print($this->debugbeg . "_read_v1()<HR>\n");
@@ -457,7 +459,7 @@ class MP3_Id {
     if ($this->debug) print($this->debugend);
     } // _read_v1()
 
-    /*
+    /**
      * decodes that ID3v1 or ID3v1.1 tag
      *
      * false will be returned if there was an error decoding the tag
@@ -465,6 +467,7 @@ class MP3_Id {
      *
      * @param   string  $rawtag    tag to decode
      * @return  string  decoded tag
+     * @access  private
      */
     function _decode_v1($rawtag) {
     if ($this->debug) print($this->debugbeg . "_decode_v1(\$rawtag)<HR>\n");
@@ -490,10 +493,11 @@ class MP3_Id {
     } // _decode_v1()
 
 
-    /*
+    /**
      * writes a ID3 v1 or v1.1 tag to a file
      *
      * @return mixed    returns PEAR_Error when fails
+     * @access private
      */
     function _write_v1() {
     if ($this->debug) print($this->debugbeg . "_write_v1()<HR>\n");
@@ -540,6 +544,7 @@ class MP3_Id {
      * the newly built tag will be returned
      *
      * @return string the new tag
+     * @access private
      */
     function _encode_v1() {
     if ($this->debug) print($this->debugbeg . "_encode_v1()<HR>\n");
@@ -581,13 +586,14 @@ class MP3_Id {
     return $newtag;
     } // _encode_v1()
 
-    /*
+    /**
      * if exists it removes an ID3v1 or v1.1 tag
      *
      * returns true if the tag was removed or none was found
      * else false if there was an error
      * 
      * @return boolean true, if the tag was removed
+     * @access private
      */
     function _remove_v1() {
     if ($this->debug) print($this->debugbeg . "_remove_v1()<HR>\n");
@@ -621,6 +627,7 @@ class MP3_Id {
     * reads a frame from the file
     *
     * @return mixed PEAR_Error when fails
+    * @access private
     */
     function _readframe() {
     if ($this->debug) print($this->debugbeg . "_readframe()<HR>\n");
@@ -748,7 +755,7 @@ class MP3_Id {
     if ($this->debug) print($this->debugend);
     } // _readframe()
 
-    /*
+    /**
      * getGenre - return the name of a genre number
      *
      * if no genre number is specified the genre number from
@@ -808,7 +815,7 @@ class MP3_Id {
     } // getGenreNo($genre, $default = 0xff)
 
     /*
-     * genres - reuturns an array of the ID3v1 genres
+     * genres - returns an array of the ID3v1 genres
      *
      * @return array
      *
