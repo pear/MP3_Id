@@ -61,7 +61,7 @@ define('PEAR_MP3_ID_NOMP3', 4);
  * Note: This code doesn't try to deal with corrupt mp3s. So if you get
  * incorrect length times or something else it may be your mp3. To fix just
  * re-enocde from the CD. :~)
- * 
+ *
  * eg:
  * require_once("MP3/Id.php");
  * $file = "Some Song.mp3";
@@ -102,7 +102,7 @@ class MP3_Id {
     * ID3 v2 tag found? (not used yet)
     * @var boolean
     */        
-    var $id3v2 = false;  
+    var $id3v2 = false;
 
     // ID3v1.1 Fields:
     /**
@@ -138,7 +138,7 @@ class MP3_Id {
     /**
     * genre name
     * @var string
-    */                
+    */
     var $genre = '';
     /**
     * genre number
@@ -152,7 +152,8 @@ class MP3_Id {
     * @var boolean
     */
     var $studied = false;
-    **
+    
+    /**
     * version of mpeg
     * @var integer
     */    
@@ -176,7 +177,7 @@ class MP3_Id {
     * frequency
     * @var integer
     */                
-    var $frequency = 0; 
+    var $frequency = 0;
     /**
     * Frames padded
     * @var boolean
@@ -210,7 +211,7 @@ class MP3_Id {
     /**
     * Bytes in file 
     * @var integer
-    */                            
+    */
     var $filesize = -1;
     /**
     * Byte at which the first mpeg header was found
@@ -220,7 +221,7 @@ class MP3_Id {
     /**
     * length of mp3 format hh:ss
     * @var string
-    */                            
+    */
     var $length = false; 
     /**
     * length of mp3 in seconds
@@ -247,24 +248,22 @@ class MP3_Id {
     /**
     * print debugg
     * @var string
-    */    
+    */
     var $debugend = '</DIV>';
 
     /*
-     * creates a new id3 object 
-     * and maybe loads a tag from a file.
+     * creates a new id3 object
+     * and loads a tag from a file.
      *
-     * @param string    $file   the path to the mp3/mpeg file. When in doubt use a full path.
      * @param string    $study  study the mpeg frame to get extra info like bitrate and frequency
-     *                          You should advoid studing alot of files as it will siginficantly 
+     *                          You should advoid studing alot of files as it will siginficantly
      *                          slow this down.
      * @access public
      */
     function MP3_Id($study = false) {
-        if (defined('ID3_SHOW_DEBUG')) $this->debug = true;    
-        if ($study or defined('ID3_AUTO_STUDY'))
-            $this->study();
-    
+        if(defined('ID3_SHOW_DEBUG')) $this->debug = true;
+        $this->study=($study || defined('ID3_AUTO_STUDY'));
+
     } // id3()
 
     /**
@@ -274,15 +273,15 @@ class MP3_Id {
     * @return   mixed   PEAR_Error on error
     * @access   public
     */
-    function read( $file) {
+    function read( $file="") {
         if ($this->debug) print($this->debugbeg . "id3('$file')<HR>\n");
-        
-        $this->file = $file;
-        if ($this->debug) print($this->debugend);        
-        
-        return $this->_read_v1();                        
+
+        if(!empty($file))$this->file = $file;
+        if ($this->debug) print($this->debugend);
+
+        return $this->_read_v1();
     }
-    
+
     /**
     * sets a field
     * 
