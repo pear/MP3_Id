@@ -654,8 +654,9 @@ class MP3_Id {
 
         $r = fread($f, 4);
         // Binary to Hex to a binary sting. ugly but best I can think of.
-        $bits = unpack('H*bits', $r);
-        $bits =  base_convert($bits['bits'],16,2);
+        // $bits = unpack('H*bits', $r);
+        // $bits =  base_convert($bits['bits'],16,2);
+        $bits = sprintf("%'08b%'08b%'08b%'08b", ord($r{0}), ord($r{1}), ord($r{2}), ord($r{3}));
     } while (!$bits[8] and !$bits[9] and !$bits[10]); // 1st 8 bits true from the while
     if ($this->debug) print('Bits: ' . $bits . "\n");
 
