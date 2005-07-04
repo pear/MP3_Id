@@ -19,12 +19,12 @@
   </maintainers>
 
   <release>
-    <version>1.1.3</version>
-    <date>2004-06-14</date>
+    <version>1.1.4</version>
+    <date>2005-07-04</date>
     <state>stable</state>
     <notes>
-     Fixed bug #1621 (removed unnecessary line at the end of file)
-     (thanks to pear dot neufeind at speedpartner dot de)
+     Fixed bug #4179 (workaround for php bug)
+     (thanks to vincentlascaux)
     </notes>
     <filelist>
      <dir name="/" baseinstalldir="MP3">
@@ -34,6 +34,15 @@
   </release>
 
   <changelog>
+   <release>
+    <version>1.1.3</version>
+    <date>2004-06-14</date>
+    <state>stable</state>
+    <notes>
+     Fixed bug #1621 (removed unnecessary line at the end of file)
+     (thanks to pear dot neufeind at speedpartner dot de)
+    </notes>
+  </release>
       <release>
       <version>1.1.2</version>
       <date>2004-04-21</date>
