@@ -19,12 +19,12 @@
   </maintainers>
 
   <release>
-    <version>1.2.0RC1</version>
-    <date>2005-07-04</date>
+    <version>1.2.0RC2</version>
+    <date>2005-08-25</date>
     <state>beta</state>
     <notes>
-     Added VBR support provided by xpindex at hompus dot nl.
-     My tests showed no problems, but i better make a RC first.
+     fix a bug noticed in #4179, now it cares about
+     magic_quotes_runtime
     </notes>
     <filelist>
      <dir name="/" baseinstalldir="MP3">
@@ -34,6 +34,15 @@
   </release>
 
   <changelog>
+   <release>
+    <version>1.2.0RC1</version>
+    <date>2005-08-25</date>
+    <state>beta</state>
+    <notes>
+     Added VBR support provided by xpindex at hompus dot nl.
+     My tests showed no problems, but i better make a RC first.
+    </notes>
+   </release>
    <release>
     <version>1.1.4</version>
     <date>2005-07-04</date>
