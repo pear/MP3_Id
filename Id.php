@@ -45,19 +45,19 @@ define('PEAR_MP3_ID_RE', 2);
 
 /**
 * Tag not found
-* @const PEAR_MP3_ID_TNF 
+* @const PEAR_MP3_ID_TNF
 */
 define('PEAR_MP3_ID_TNF', 3);
 
 /**
 * File is not a MP3 file (corrupted?)
-* @const PEAR_MP3_ID_NOMP3 
+* @const PEAR_MP3_ID_NOMP3
 */
 define('PEAR_MP3_ID_NOMP3', 4);
 
 /**
  * A Class for reading/writing MP3 ID3 tags
- * 
+ *
  * Note: This code doesn't try to deal with corrupt mp3s. So if you get
  * incorrect length times or something else it may be your mp3. To fix just
  * re-enocde from the CD. :~)
@@ -76,7 +76,7 @@ define('PEAR_MP3_ID_NOMP3', 4);
  * $id3->write();
  * $id3->read($file);
  * print_r($id3 );
- * 
+ *
  * @package MP3_Id
  * @author Sandy McArthur Jr. <Leknor@Leknor.com>
  * @version $Version$
@@ -87,53 +87,53 @@ class MP3_Id {
     * mp3/mpeg file name
     * @var boolean
     */
-    var $file = false;      
+    var $file = false;
     /**
     * ID3 v1 tag found? (also true if v1.1 found)
     * @var boolean
     */
-    var $id3v1 = false;     
+    var $id3v1 = false;
     /**
-    * ID3 v1.1 tag found? 
+    * ID3 v1.1 tag found?
     * @var boolean
-    */    
+    */
     var $id3v11 = false;
     /**
     * ID3 v2 tag found? (not used yet)
     * @var boolean
-    */        
+    */
     var $id3v2 = false;
 
     // ID3v1.1 Fields:
     /**
     * trackname
     * @var string
-    */        
+    */
     var $name = '';
     /**
     * artists
     * @var string
-    */            
+    */
     var $artists = '';
     /**
     * album
     * @var string
-    */                
+    */
     var $album = '';
     /**
     * year
     * @var string
-    */                
-    var $year = '';  
+    */
+    var $year = '';
     /**
     * comment
     * @var string
-    */                
+    */
     var $comment = '';
     /**
     * track number
     * @var integer
-    */                
+    */
     var $track = 0;
     /**
     * genre name
@@ -143,7 +143,7 @@ class MP3_Id {
     /**
     * genre number
     * @var integer
-    */                    
+    */
     var $genreno = 255;
 
     // MP3 Frame Stuff
@@ -152,88 +152,123 @@ class MP3_Id {
     * @var boolean
     */
     var $studied = false;
-    
+
     /**
     * version of mpeg
     * @var integer
-    */    
+    */
     var $mpeg_ver = 0;
     /**
     * version of layer
     * @var integer
-    */        
+    */
     var $layer = 0;
     /**
     * version of bitrate
     * @var integer
-    */        
+    */
     var $bitrate = 0;
     /**
     * Frames are crc protected?
     * @var boolean
-    */            
+    */
     var $crc = false;
     /**
     * frequency
     * @var integer
-    */                
+    */
     var $frequency = 0;
+    /**
+    * encoding type (CBR or VBR)
+    * @var string
+    */
+    var $encoding_type = 0;
+    /**
+    * number of samples per MPEG audio frame
+    * @var integer
+    */
+    var $samples_per_frame = 0;
+    /**
+    * samples in file
+    * @var integer
+    */
+    var $samples = 0;
+    /**
+    * Bytes in file without tag overhead
+    * @var integer
+    */
+    var $musicsize = -1;
+    /**
+    * number of MPEG audio frames
+    * @var integer
+    */
+    var $frames = 0;
+    /**
+    * quality indicator (0% - 100%)
+    * @var integer
+    */
+    var $quality = 0;
     /**
     * Frames padded
     * @var boolean
-    */                
+    */
     var $padding = false;
     /**
     * private bit set
     * @var boolean
-    */                    
+    */
     var $private = false;
     /**
     * Mode (Stero etc)
     * @var string
-    */                    
+    */
     var $mode = '';
     /**
     * Copyrighted
     * @var string
-    */                        
-    var $copyright = false; 
+    */
+    var $copyright = false;
     /**
     * On Original Media? (never used)
     * @var boolean
-    */                        
+    */
     var $original = false;
     /**
     * Emphasis (also never used)
     * @var boolean
-    */                        
-    var $emphasis = '';     
+    */
+    var $emphasis = '';
     /**
-    * Bytes in file 
+    * Bytes in file
     * @var integer
     */
     var $filesize = -1;
     /**
     * Byte at which the first mpeg header was found
     * @var integer
-    */                            
+    */
     var $frameoffset = -1;
-    /**
-    * length of mp3 format hh:ss
+     /**
+    * length of mp3 format hh:mm:ss
     * @var string
     */
-    var $length = false; 
+    var $lengthh = false;
+    /**
+    * length of mp3 format mm:ss
+    * @var string
+    */
+    var $length = false;
     /**
     * length of mp3 in seconds
     * @var string
-    */                            
+    */
     var $lengths = false;
 
     /**
     * if any errors they will be here
     * @var string
     */
-    var $error = false;    
+    var $error = false;
 
     /**
     * print debugging info?
@@ -243,7 +278,7 @@ class MP3_Id {
     /**
     * print debugg
     * @var string
-    */    
+    */
     var $debugbeg = '<DIV STYLE="margin: 0.5 em; padding: 0.5 em; border-width: thin; border-color: black; border-style: solid">';
     /**
     * print debugg
@@ -284,7 +319,7 @@ class MP3_Id {
 
     /**
     * sets a field
-    * 
+    *
     * possible names of tags are:
     * artists   - Name of band or artist
     * album     - Name of the album
@@ -295,7 +330,7 @@ class MP3_Id {
     * genreno   - Number of the genre
     *
     * @param    mixed   $name   Name of the tag to set or hash with the key as fieldname
-    * @param    mixed   $value  the value to set 
+    * @param    mixed   $value  the value to set
     *
     * @access   public
     */
@@ -305,18 +340,18 @@ class MP3_Id {
                 $this -> $n = $v ;
                 }
         } else {
-            $this -> $name = $value ;        
+            $this -> $name = $value ;
         }
     }
-    
+
     /**
     * get the value of a tag
-    * 
+    *
     * @param    string  $name       the name of the field to get
     * @param    mixed   $default    returned if the field not exists
-    * 
+    *
     * @return   mixed   The value of the field
-    * @access   public 
+    * @access   public
     * @see      setTag
     */
     function getTag($name, $default = 0) {
@@ -325,15 +360,15 @@ class MP3_Id {
         } else {
             return $this -> $name ;
         }
-    }        
-    
+    }
+
     /**
      * update the id3v1 tags on the file.
      * Note: If/when ID3v2 is implemented this method will probably get another
      *       parameters.
-     *     
+     *
      * @param boolean $v1   if true update/create an id3v1 tag on the file. (defaults to true)
-     * 
+     *
      * @access public
      */
     function write($v1 = true) {
@@ -346,7 +381,7 @@ class MP3_Id {
 
     /**
      * study() - does extra work to get the MPEG frame info.
-     * 
+     *
      * @access public
      */
     function study() {
@@ -356,7 +391,7 @@ class MP3_Id {
 
     /**
      * copy($from) - set's the ID3 fields to the same as the fields in $from
-     * 
+     *
      * @param string    $from   fields to copy
      * @access public
      */
@@ -590,7 +625,7 @@ class MP3_Id {
      *
      * returns true if the tag was removed or none was found
      * else false if there was an error
-     * 
+     *
      * @return boolean true, if the tag was removed
      * @access private
      */
@@ -613,7 +648,7 @@ class MP3_Id {
     if ( !PEAR::isError( $this->_decode_v1($r))) {
         $size = filesize($this->file) - 128;
         if ($this->debug) print('size: old: ' . filesize($this->file));
-        $success = ftruncate($f, $size);    
+        $success = ftruncate($f, $size);
         clearstatcache();
         if ($this->debug) print(' new: ' . filesize($this->file));
     }
@@ -661,6 +696,113 @@ class MP3_Id {
     if ($this->debug) print('Bits: ' . $bits . "\n");
 
     $this->frameoffset = $frameoffset;
+
+    // Detect VBR header
+    if ($bits[11] == 0) {
+        if (($bits[24] == 1) && ($bits[25] == 1)) {
+            $vbroffset = 9; // MPEG 2.5 Mono
+        } else {
+            $vbroffset = 17; // MPEG 2.5 Stereo
+        }
+    } else if ($bits[12] == 0) {
+        if (($bits[24] == 1) && ($bits[25] == 1)) {
+            $vbroffset = 9; // MPEG 2 Mono
+        } else {
+            $vbroffset = 17; // MPEG 2 Stereo
+        }
+    } else {
+        if (($bits[24] == 1) && ($bits[25] == 1)) {
+            $vbroffset = 17; // MPEG 1 Mono
+        } else {
+            $vbroffset = 32; // MPEG 1 Stereo
+        }
+    }
+
+    fseek($f, ftell($f) + $vbroffset);
+    $r = fread($f, 4);
+
+    switch ($r) {
+        case 'Xing':
+            $this->encoding_type = 'VBR';
+        case 'Info':
+            // Extract info from Xing header
+
+            if ($this->debug) print('Encoding Header: ' . $r . "\n");
+
+            $r = fread($f, 4);
+            $vbrbits = sprintf("%'08b", ord($r{3}));
+
+            if ($this->debug) print('XING Header Bits: ' . $vbrbits . "\n");
+
+            if ($vbrbits[7] == 1) {
+                // Next 4 bytes contain number of frames
+                $r = fread($f, 4);
+                $this->frames = unpack('N', $r);
+                $this->frames = $this->frames[1];
+            }
+
+            if ($vbrbits[6] == 1) {
+                // Next 4 bytes contain number of bytes
+                $r = fread($f, 4);
+                $this->musicsize = unpack('N', $r);
+                $this->musicsize = $this->musicsize[1];
+            }
+
+            if ($vbrbits[5] == 1) {
+                // Next 100 bytes contain TOC entries, skip
+                fseek($f, ftell($f) + 100);
+            }
+
+            if ($vbrbits[4] == 1) {
+                // Next 4 bytes contain Quality Indicator
+                $r = fread($f, 4);
+                $this->quality = unpack('N', $r);
+                $this->quality = $this->quality[1];
+            }
+
+            break;
+
+        case 'VBRI':
+        default:
+            if ($vbroffset != 32) {
+                // VBRI Header is fixed after 32 bytes, so maybe we are looking at the wrong place.
+                fseek($f, ftell($f) + 32 - $vbroffset);
+                $r = fread($f, 4);
+
+                if ($r != 'VBRI') {
+                    $this->encoding_type = 'CBR';
+                    break;
+                }
+            } else {
+                $this->encoding_type = 'CBR';
+                break;
+            }
+
+            if ($this->debug) print('Encoding Header: ' . $r . "\n");
+
+            $this->encoding_type = 'VBR';
+
+            // Next 2 bytes contain Version ID, skip
+            fseek($f, ftell($f) + 2);
+
+            // Next 2 bytes contain Delay, skip
+            fseek($f, ftell($f) + 2);
+
+            // Next 2 bytes contain Quality Indicator
+            $r = fread($f, 2);
+            $this->quality = unpack('n', $r);
+            $this->quality = $this->quality[1];
+
+            // Next 4 bytes contain number of bytes
+            $r = fread($f, 4);
+            $this->musicsize = unpack('N', $r);
+            $this->musicsize = $this->musicsize[1];
+
+            // Next 4 bytes contain number of frames
+            $r = fread($f, 4);
+            $this->frames = unpack('N', $r);
+            $this->frames = $this->frames[1];
+    }
 
     fclose($f);
 
@@ -744,13 +886,48 @@ class MP3_Id {
              );
     $this->emphasis = $emphasis[$bits[30]][$bits[31]];
 
-    if ($this->bitrate == 0) {
-        $s = -1;
+    $samplesperframe = array(
+        '1' => array(
+            '1' => 384,
+            '2' => 1152,
+            '3' => 1152
+        ),
+        '2' => array(
+            '1' => 384,
+            '2' => 1152,
+            '3' => 576
+        ),
+        '2.5' => array(
+            '1' => 384,
+            '2' => 1152,
+            '3' => 576
+        ),
+    );
+    $this->samples_per_frame = $samplesperframe[$this->mpeg_ver][$this->layer];
+
+    if ($this->encoding_type != 'VBR') {
+        if ($this->bitrate == 0) {
+            $s = -1;
+        } else {
+            $s = ((8*filesize($this->file))/1000) / $this->bitrate;
+        }
+        $this->length = sprintf('%02d:%02d',floor($s/60),floor($s-(floor($s/60)*60)));
+        $this->lengthh = sprintf('%02d:%02d:%02d',floor($s/3600),floor($s/60),floor($s-(floor($s/60)*60)));
+        $this->lengths = (int)$s;
+
+        $this->samples = ceil($this->lengths * $this->frequency);
+        $this->frames = ceil($this->samples / $this->samples_per_frame);
+        $this->musicsize = ceil($this->lengths * $this->bitrate * 1000 / 8);
     } else {
-        $s = ((8*filesize($this->file))/1000) / $this->bitrate;        
+        $this->samples = $this->samples_per_frame * $this->frames;
+        $s = $this->samples / $this->frequency;
+
+        $this->length = sprintf('%02d:%02d',floor($s/60),floor($s-(floor($s/60)*60)));
+        $this->lengthh = sprintf('%02d:%02d:%02d',floor($s/3600),floor($s/60),floor($s-(floor($s/60)*60)));
+        $this->lengths = (int)$s;
+
+        $this->bitrate = (int)(($this->musicsize / $s) * 8 / 1000);
     }
-    $this->length = sprintf('%02d:%02d',floor($s/60),floor($s-(floor($s/60)*60)));
-    $this->lengths = (int)$s;
 
     if ($this->debug) print($this->debugend);
     } // _readframe()
@@ -767,7 +944,7 @@ class MP3_Id {
      * @param   integer $genreno Number of the genre
      * @return  mixed   false, if no genre found, else string
      *
-     * @access public     
+     * @access public
      */
     function getGenre($genreno) {
     if ($this->debug) print($this->debugbeg . "getgenre($genreno)<HR>\n");
