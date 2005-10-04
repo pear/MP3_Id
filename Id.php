@@ -932,7 +932,11 @@ class MP3_Id {
         $this->lengths = (int)$s;
 
         $this->samples = ceil($this->lengths * $this->frequency);
-        $this->frames = ceil($this->samples / $this->samples_per_frame);
+        if(0 != $this->samples_per_frame) {
+            $this->frames = ceil($this->samples / $this->samples_per_frame);
+        } else {
+            $this->frames = 0;
+        }
         $this->musicsize = ceil($this->lengths * $this->bitrate * 1000 / 8);
     } else {
         $this->samples = $this->samples_per_frame * $this->frames;

@@ -19,6 +19,21 @@
   </maintainers>
 
   <release>
+    <version>1.2.0RC3</version>
+    <date>2005-10-04</date>
+    <state>beta</state>
+    <notes>
+     fix Bug #5396, thanks to waranza at gmail dot com
+    </notes>
+    <filelist>
+     <dir name="/" baseinstalldir="MP3">
+      <file role="php">Id.php</file>
+     </dir>
+    </filelist>
+  </release>
+
+  <changelog>
+   <release>
     <version>1.2.0RC2</version>
     <date>2005-08-25</date>
     <state>beta</state>
@@ -31,9 +46,7 @@
       <file role="php">Id.php</file>
      </dir>
     </filelist>
-  </release>
-
-  <changelog>
+   </release>
    <release>
     <version>1.2.0RC1</version>
     <date>2005-08-25</date>
