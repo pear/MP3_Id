@@ -79,7 +79,7 @@ define('PEAR_MP3_ID_NOMP3', 4);
  *
  * @package MP3_Id
  * @author Sandy McArthur Jr. <Leknor@Leknor.com>
- * @version $Version$
+ * @version $Id$
  */
 class MP3_Id {
 
