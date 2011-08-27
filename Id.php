@@ -443,9 +443,6 @@ class MP3_Id {
     function _read_v1() {
     if ($this->debug) print($this->debugbeg . "_read_v1()<HR>\n");
 
-    $mqr = get_magic_quotes_runtime();
-    set_magic_quotes_runtime(0);
-
     if (! ($f = @fopen($this->file, 'rb')) ) {
         return PEAR::raiseError( "Unable to open " . $this->file, PEAR_MP3_ID_FNO);
     }
@@ -456,7 +453,6 @@ class MP3_Id {
 
     $r = fread($f, 128);
     fclose($f);
-    set_magic_quotes_runtime($mqr);
 
     if ($this->debug) {
         $unp = unpack('H*raw', $r);
@@ -554,9 +550,6 @@ class MP3_Id {
     $this->genreno = $this->getgenreno($this->genre, $this->genreno);
 
     $newtag = $this->_encode_v1();
-    
-    $mqr = get_magic_quotes_runtime();
-    set_magic_quotes_runtime(0);
 
     $r = fread($f, 128);
 
@@ -574,7 +567,6 @@ class MP3_Id {
         fwrite($f, $newtag);
     }
     fclose($f);
-    set_magic_quotes_runtime($mqr);
 
     if ($this->debug) print($this->debugend);
     } // _write_v1()
@@ -649,9 +641,6 @@ class MP3_Id {
         return PEAR::raiseError( 'Unable to see to end - 128 of ' . $file, PEAR_MP3_ID_RE);
     }
 
-    $mqr = get_magic_quotes_runtime();
-    set_magic_quotes_runtime(0);
-
     $r = fread($f, 128);
 
     $success = false;
@@ -663,7 +652,6 @@ class MP3_Id {
         if ($this->debug) print(' new: ' . filesize($this->file));
     }
     fclose($f);
-    set_magic_quotes_runtime($mqr);
 
     if ($this->debug) print($this->debugend);
     return $success;
@@ -679,9 +667,6 @@ class MP3_Id {
     if ($this->debug) print($this->debugbeg . "_readframe()<HR>\n");
 
     $file = $this->file;
-
-    $mqr = get_magic_quotes_runtime();
-    set_magic_quotes_runtime(0);
 
     if (! ($f = fopen($file, 'rb')) ) {
         if ($this->debug) print($this->debugend);
@@ -820,7 +805,6 @@ class MP3_Id {
     }
 
     fclose($f);
-    set_magic_quotes_runtime($mqr);
 
     if ($bits[11] == 0) {
         $this->mpeg_ver = "2.5";
