@@ -17,8 +17,23 @@
       <email>alexmerz@php.net</email>
     </maintainer>
   </maintainers>
-
   <release>
+    <version>1.2.1</version>
+    <date>2011-08-29</date>
+    <state>stable</state>
+    <notes>
+     Fixed:
+     #18761 Deprecated set_magic_quotes_runtime
+    </notes>
+    <filelist>
+     <dir name="/" baseinstalldir="MP3">
+      <file role="php">Id.php</file>
+     </dir>
+    </filelist>
+  </release>
+
+  <changelog>
+   <release>
     <version>1.2.0</version>
     <date>2005-11-24</date>
     <state>stable</state>
@@ -30,9 +45,7 @@
       <file role="php">Id.php</file>
      </dir>
     </filelist>
-  </release>
-
-  <changelog>
+   </release>
    <release>
     <version>1.2.0RC3</version>
     <date>2005-10-04</date>
