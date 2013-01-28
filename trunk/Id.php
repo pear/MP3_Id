@@ -14,18 +14,18 @@
 // $Id$
 //
 
-// Uncomment the folling define if you want the class to automatically
+// Uncomment the following define if you want the class to automatically
 // read the MPEG frame info to get bitrate, mpeg version, layer, etc.
 //
 // NOTE: This is needed to maintain pre-version 1.0 behavior which maybe
 // needed if you are using info that is from the mpeg frame. This includes
 // the length of the song.
 //
-// This is discouraged because it will siginfincantly lengthen script
+// This is discouraged because it will significantly lengthen script
 // execution time if all you need is the ID3 tag info.
 // define('ID3_AUTO_STUDY', true);
 
-// Uncomment the following define if you want tons of debgging info.
+// Uncomment the following define if you want tons of debugging info.
 // Tip: make sure you use a <PRE> block so the print_r's are readable.
 // define('ID3_SHOW_DEBUG', true);
 
@@ -64,7 +64,7 @@ define('PEAR_MP3_ID_NOMP3', 4);
  *
  * Note: This code doesn't try to deal with corrupt mp3s. So if you get
  * incorrect length times or something else it may be your mp3. To fix just
- * re-enocde from the CD. :~)
+ * re-encode from the CD. :~)
  *
  * eg:
  * require_once("MP3/Id.php");
@@ -87,7 +87,6 @@ define('PEAR_MP3_ID_NOMP3', 4);
  */
 class MP3_Id
 {
-
     /**
      * mp3/mpeg file name
      *
@@ -250,7 +249,7 @@ class MP3_Id
      */
     var $private = false;
     /**
-     * Mode (Stero etc)
+     * Mode (Stereo etc)
      *
      * @var string
      */
@@ -335,7 +334,7 @@ class MP3_Id
      * and loads a tag from a file.
      *
      * @param string    $study  study the mpeg frame to get extra info like bitrate and frequency
-     *                          You should advoid studing alot of files as it will siginficantly
+     *                          You should avoid studying a lot of files as it will significantly
      *                          slow this down.
      * @access public
      */
