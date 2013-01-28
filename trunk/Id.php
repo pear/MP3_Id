@@ -447,12 +447,13 @@ class MP3_Id
     /**
      * study() - does extra work to get the MPEG frame info.
      *
+     * @return mixed PEAR_Error when fails
      * @access public
      */
     function study()
     {
         $this->studied = true;
-        $this->_readframe();
+        return $this->_readframe();
     } // study()
 
     /**
