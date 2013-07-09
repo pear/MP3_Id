@@ -90,9 +90,9 @@ class MP3_Id
     /**
      * mp3/mpeg file name
      *
-     * @var boolean
+     * @var string
      */
-    var $file = false;
+    var $file = '';
     /**
      * ID3 v1 tag found? (also true if v1.1 found)
      *
