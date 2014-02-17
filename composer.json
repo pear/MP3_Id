@@ -1,0 +1,25 @@
+{
+    "authors": [
+        {
+            "email": "alexmerz@php.net",
+            "name": "Alexander Merz",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "./"
+        ]
+    },
+    "description": "More info available on: http://pear.php.net/package/MP3_Id",
+    "license": "\n   LGPL\n  ",
+    "name": "pear/mp3_id",
+    "support": {
+        "issues": "http:///bugs/search.php?cmd=display&package_name[]=MP3_Id",
+        "source": "https://github.com/pear/MP3_Id"
+    },
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
