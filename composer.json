@@ -19,6 +19,9 @@
         "source": "https://github.com/pear/MP3_Id"
     },
     "type": "library",
+    "require": {
+        "pear/pear": "*"
+    },
     "require-dev": {
         "phpunit/phpunit": "*"
     }
