@@ -379,10 +379,8 @@ class MP3_Id
      *
      * @param    mixed   $name   Name of the tag to set or hash with the key as fieldname
      * @param    mixed   $value  the value to set
-     *
-     * @access   public
      */
-    function setTag($name, $value)
+    public function setTag($name, $value)
     {
         if (is_array($name)) {
             foreach ($name as $n => $v) {
@@ -400,10 +398,9 @@ class MP3_Id
      * @param    mixed   $default    returned if the field not exists
      *
      * @return   mixed   The value of the field
-     * @access   public
      * @see      setTag
      */
-    function getTag($name, $default = 0)
+    public function getTag($name, $default = 0)
     {
         if (empty($this->$name)) {
             return $default;
@@ -500,10 +497,8 @@ class MP3_Id
      *
      * $file should be the path to the mp3 to look for a tag.
      * When in doubt use the full path.
-     *
-     * @access private
      */
-    function _read_v1()
+    protected function _read_v1()
     {
         if ($this->debug) {
             print($this->debugbeg . "_read_v1()<HR>\n");
@@ -1090,10 +1085,8 @@ class MP3_Id
      * @param   integer $genreno Number of the genre
      *
      * @return  mixed   false, if no genre found, else string
-     *
-     * @access public
      */
-    function getGenre($genreno)
+    public function getGenre($genreno)
     {
         if ($this->debug) {
             print($this->debugbeg . "getgenre($genreno)<HR>\n");
@@ -1125,10 +1118,8 @@ class MP3_Id
      *
      * @param   string  $genre      Name of the genre
      * @param   integer $default    Genre number in case of genre not found
-     *
-     * @access public
      */
-    function getGenreNo($genre, $default = 0xff)
+    public function getGenreNo($genre, $default = 0xff)
     {
         if ($this->debug) {
             print($this->debugbeg . "getgenreno('$genre',$default)<HR>\n");
@@ -1160,10 +1151,8 @@ class MP3_Id
      * genres - returns an array of the ID3v1 genres
      *
      * @return array
-     *
-     * @access public
      */
-    function genres()
+    public function genres()
     {
         return array(
             0 => 'Blues',
