@@ -1,4 +1,6 @@
 <?php
+require 'Log.php';
+require 'Log/console.php';
 //
 // +----------------------------------------------------------------------+
 // | PHP Version 5                                                        |
@@ -24,10 +26,6 @@
 // This is discouraged because it will significantly lengthen script
 // execution time if all you need is the ID3 tag info.
 // define('ID3_AUTO_STUDY', true);
-
-// Uncomment the following define if you want tons of debugging info.
-// Tip: make sure you use a <PRE> block so the print_r's are readable.
-// define('ID3_SHOW_DEBUG', true);
 
 /**
  * File not opened
@@ -308,25 +306,6 @@ class MP3_Id
      */
     var $error = false;
 
-    /**
-     * print debugging info?
-     *
-     * @var boolean
-     */
-    var $debug = false;
-    /**
-     * print debugg
-     *
-     * @var string
-     */
-    var $debugbeg = '<DIV STYLE="margin: 0.5em; padding: 0.5em; border-width: thin; border-color: black; border-style: solid">';
-    /**
-     * print debugg
-     *
-     * @var string
-     */
-    var $debugend = '</DIV>';
-
     /*
      * creates a new id3 object
      * and loads a tag from a file.
@@ -335,10 +314,11 @@ class MP3_Id
      *                          You should avoid studying a lot of files as it will significantly
      *                          slow this down.
      */
-    public function __construct($study = false)
+    public function __construct($study = false, Log $log = null)
     {
-        if (defined('ID3_SHOW_DEBUG')) {
-            $this->debug = true;
+        $this->log = $log;
+        if (!$this->log) {
+            $this->log = new Log_console(null);
         }
         $this->study = ($study || defined('ID3_AUTO_STUDY'));
 
@@ -351,15 +331,10 @@ class MP3_Id
      */
     public function read($file = "")
     {
-        if ($this->debug) {
-            print($this->debugbeg . "id3('$file')<HR>\n");
-        }
+        $this->log->debug("read('$file')");
 
         if (!empty($file)) {
             $this->file = $file;
-        }
-        if ($this->debug) {
-            print($this->debugend);
         }
 
         return $this->_read_v1();
@@ -418,15 +393,10 @@ class MP3_Id
      */
     public function write($v1 = true)
     {
-        if ($this->debug) {
-            print($this->debugbeg . "write()<HR>\n");
-        }
+        $this->log->debug("write()\n");
         $result = null;
         if ($v1) {
             $result = $this->_write_v1();
-        }
-        if ($this->debug) {
-            print($this->debugend);
         }
         return $result;
     } // write()
@@ -447,9 +417,7 @@ class MP3_Id
      */
     public function copy($from)
     {
-        if ($this->debug) {
-            print($this->debugbeg . "copy(\$from)<HR>\n");
-        }
+        $this->log->debug("copy(\$from)");
         $this->name = $from->name;
         $this->artists = $from->artists;
         $this->album = $from->album;
@@ -458,9 +426,6 @@ class MP3_Id
         $this->track = $from->track;
         $this->genre = $from->genre;
         $this->genreno = $from->genreno;
-        if ($this->debug) {
-            print($this->debugend);
-        }
     } // copy($from)
 
     /**
@@ -471,9 +436,7 @@ class MP3_Id
      */
     public function remove($id3v1 = true, $id3v2 = true)
     {
-        if ($this->debug) {
-            print($this->debugbeg . "remove()<HR>\n");
-        }
+        $this->log->debug("remove()");
 
         $result = null;
         if ($id3v1) {
@@ -482,10 +445,6 @@ class MP3_Id
 
         if ($id3v2) {
             // TODO: write ID3v2 code
-        }
-
-        if ($this->debug) {
-            print($this->debugend);
         }
 
         return $result;
@@ -500,9 +459,7 @@ class MP3_Id
      */
     protected function _read_v1()
     {
-        if ($this->debug) {
-            print($this->debugbeg . "_read_v1()<HR>\n");
-        }
+        $this->log->debug("_read_v1()");
 
         if (!($f = @fopen($this->file, 'rb'))) {
             throw new MP3_Exception("Unable to open " . $this->file, PEAR_MP3_ID_FNO);
@@ -515,11 +472,9 @@ class MP3_Id
         $r = fread($f, 128);
         fclose($f);
 
-        if ($this->debug) {
-            $unp = unpack('H*raw', $r);
-            print_r($unp);
-        }
-    
+        $unp = unpack('H*raw', $r);
+        $this->log->debug($unp);
+
         $id3tag = $this->_decode_v1($r);
     
         $this->id3v1 = true;
@@ -548,9 +503,6 @@ class MP3_Id
         $this->genre = $id3tag['GENRE'];
     
 
-        if ($this->debug) {
-            print($this->debugend);
-        }
 
         return $id3tag;
     } // _read_v1()
@@ -567,9 +519,7 @@ class MP3_Id
      */
     protected function _decode_v1($rawtag)
     {
-        if ($this->debug) {
-            print($this->debugbeg . "_decode_v1(\$rawtag)<HR>\n");
-        }
+        $this->log->debug("_decode_v1(\$rawtag)");
 
         if ($rawtag[125] == chr(0) and $rawtag[126] != chr(0)) {
             // ID3 v1.1
@@ -580,17 +530,12 @@ class MP3_Id
         }
 
         $id3tag = unpack($format, $rawtag);
-        if ($this->debug) {
-            print_r($id3tag);
-        }
+        $this->log->debug(print_r($id3tag, true));
 
         if ($id3tag['TAG'] == 'TAG') {
             $id3tag['GENRE'] = $this->getgenre($id3tag['GENRENO']);
         } else {
             throw new MP3_Exception('TAG not found', PEAR_MP3_ID_TNF);
-        }
-        if ($this->debug) {
-            print($this->debugend);
         }
 
         return $id3tag;
@@ -604,10 +549,8 @@ class MP3_Id
      */
     protected function _write_v1()
     {
-        if ($this->debug) {
-            print($this->debugbeg . "_write_v1()<HR>\n");
-        }
-
+        $this->log->debug("_write_v1()\n");
+     
         $file = $this->file;
 
         if (!($f = @fopen($file, 'r+b'))) {
@@ -641,9 +584,6 @@ class MP3_Id
         }
         fclose($f);
 
-        if ($this->debug) {
-            print($this->debugend);
-        }
     } // _write_v1()
 
     /*
@@ -655,9 +595,7 @@ class MP3_Id
      */
     protected function _encode_v1()
     {
-        if ($this->debug) {
-            print($this->debugbeg . "_encode_v1()<HR>\n");
-        }
+        $this->log->debug("_encode_v1()");
 
         if ($this->track) {
             // ID3 v1.1
@@ -688,15 +626,10 @@ class MP3_Id
             );
         }
 
-        if ($this->debug) {
-            print('id3pack: ' . $id3pack . "\n");
-            $unp = unpack('H*new', $newtag);
-            print_r($unp);
-        }
+        $this->log->debug('id3pack: ' . $id3pack);
+        $unp = unpack('H*new', $newtag);
+        $this->log->debug(print_r($unp, true));
 
-        if ($this->debug) {
-            print($this->debugend);
-        }
 
         return $newtag;
     } // _encode_v1()
@@ -711,10 +644,8 @@ class MP3_Id
      */
     protected function _remove_v1()
     {
-        if ($this->debug) {
-            print($this->debugbeg . "_remove_v1()<HR>\n");
-        }
-
+        $this->log->debug("_remove_v1()");
+     
         $file = $this->file;
 
         if (!($f = fopen($file, 'r+b'))) {
@@ -731,23 +662,16 @@ class MP3_Id
             $result = $this->_decode_v1($r);
         
             $size = filesize($this->file) - 128;
-            if ($this->debug) {
-                print('size: old: ' . filesize($this->file));
-            }
+            $this->log->debug('size: old: ' . filesize($this->file));
             if (!ftruncate($f, $size)) {
                 throw new MP3_Exception('Unable to truncate ' . $file, PEAR_MP3_ID_RE);
             }
             clearstatcache();
-            if ($this->debug) {
-                print(' new: ' . filesize($this->file));
-            }
+            $this->log->debug(' new: ' . filesize($this->file));
         } catch (MP3_Exception $e) {
             fclose($f);
         }
 
-        if ($this->debug) {
-            print($this->debugend);
-        }
 
         return $result;
     } // _remove_v1()
@@ -759,17 +683,11 @@ class MP3_Id
      */
     protected function _readframe()
     {
-        if ($this->debug) {
-            print($this->debugbeg . "_readframe()<HR>\n");
-        }
-
+        $this->log->debug("_readframe()");
+     
         $file = $this->file;
 
         if (!($f = fopen($file, 'rb'))) {
-            if ($this->debug) {
-                print($this->debugend);
-            }
-
             throw new MP3_Exception("Unable to open " . $file, PEAR_MP3_ID_FNO);
         }
 
@@ -777,14 +695,9 @@ class MP3_Id
 
         do {
             while (fread($f, 1) != chr(255)) { // Find the first frame
-                if ($this->debug) {
-                    echo "Find...\n";
-                }
-                if (feof($f)) {
-                    if ($this->debug) {
-                        print($this->debugend);
-                    }
+                $this->log->debug("Find...");
 
+                if (feof($f)) {
                     throw new MP3_Exception("No mpeg frame found", PEAR_MP3_ID_NOMP3);
                 }
             }
@@ -798,10 +711,8 @@ class MP3_Id
             // $bits =  base_convert($bits['bits'],16,2);
             $bits = sprintf("%'08b%'08b%'08b%'08b", ord($r{0}), ord($r{1}), ord($r{2}), ord($r{3}));
         } while (!$bits[8] and !$bits[9] and !$bits[10]); // 1st 8 bits true from the while
-        if ($this->debug) {
-            print('Bits: ' . $bits . "\n");
-        }
-
+        $this->log->debug('Bits: ' . $bits);
+ 
         $this->frameoffset = $frameoffset;
 
         // Detect VBR header
@@ -836,16 +747,12 @@ class MP3_Id
             case 'Info':
                 // Extract info from Xing header
 
-                if ($this->debug) {
-                    print('Encoding Header: ' . $r . "\n");
-                }
+                $this->log->debug('Encoding Header: ' . $r);
 
                 $r = fread($f, 4);
                 $vbrbits = sprintf("%'08b", ord($r{3}));
 
-                if ($this->debug) {
-                    print('XING Header Bits: ' . $vbrbits . "\n");
-                }
+                $this->log->debug('XING Header Bits: ' . $vbrbits);
 
                 if ($vbrbits[7] == 1) {
                     // Next 4 bytes contain number of frames
@@ -891,9 +798,7 @@ class MP3_Id
                     break;
                 }
 
-                if ($this->debug) {
-                    print('Encoding Header: ' . $r . "\n");
-                }
+                $this->log->debug('Encoding Header: ' . $r);
 
                 $this->encoding_type = 'VBR';
 
@@ -945,24 +850,20 @@ class MP3_Id
                 );
             }
         }
-        if ($this->debug) {
-            print('MPEG' . $this->mpeg_ver . "\n");
-        }
+
+        $this->log->debug('MPEG' . $this->mpeg_ver);
 
         $layer = array(
             array(0, 3),
             array(2, 1),
         );
         $this->layer = $layer[$bits[13]][$bits[14]];
-        if ($this->debug) {
-            print('layer: ' . $this->layer . "\n");
-        }
-
+        
+        $this->log->debug('layer: ' . $this->layer);
+   
         if ($bits[15] == 0) {
             // It's backwards, if the bit is not set then it is protected.
-            if ($this->debug) {
-                print("protected (crc)\n");
-            }
+            $this->log->debug("protected (crc)");
             $this->crc = true;
         }
 
@@ -1068,9 +969,6 @@ class MP3_Id
             $this->bitrate = (int)(($this->musicsize / $s) * 8 / 1000);
         }
 
-        if ($this->debug) {
-            print($this->debugend);
-        }
     } // _readframe()
 
     /**
@@ -1088,23 +986,16 @@ class MP3_Id
      */
     public function getGenre($genreno)
     {
-        if ($this->debug) {
-            print($this->debugbeg . "getgenre($genreno)<HR>\n");
-        }
+        $this->log->debug("getgenre($genreno)");
 
         $genres = $this->genres();
         if (isset($genres[$genreno])) {
             $genre = $genres[$genreno];
-            if ($this->debug) {
-                print($genre . "\n");
-            }
+            $this->log->debug($genre);
         } else {
             $genre = '';
         }
 
-        if ($this->debug) {
-            print($this->debugend);
-        }
 
         return $genre;
     } // getGenre($genreno)
@@ -1120,28 +1011,21 @@ class MP3_Id
      * @param   integer $default    Genre number in case of genre not found
      */
     public function getGenreNo($genre, $default = 0xff)
-    {
-        if ($this->debug) {
-            print($this->debugbeg . "getgenreno('$genre',$default)<HR>\n");
-        }
-
+    {        
+        $this->log->debug("getgenreno('$genre',$default)\n");
+        
         $genres = $this->genres();
         $genreno = false;
         if ($genre) {
             foreach ($genres as $no => $name) {
                 if (strtolower($genre) == strtolower($name)) {
-                    if ($this->debug) {
-                        print("$no:'$name' == '$genre'");
-                    }
+                    $this->log->debug("$no:'$name' == '$genre'");
                     $genreno = $no;
                 }
             }
         }
         if ($genreno === false) {
             $genreno = $default;
-        }
-        if ($this->debug) {
-            print($this->debugend);
         }
 
         return $genreno;
