@@ -1339,5 +1339,3 @@ class MP3_Id
         );
     } // genres
 } // end of id3
-
-?>
