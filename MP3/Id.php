@@ -625,7 +625,7 @@ class MP3_Id
         $r = fread($f, 128);
 
         try {
-            $this->_decode_v1($r)
+            $this->_decode_v1($r);
 
             if (fseek($f, -128, SEEK_END) == -1) {
                 throw new MP3_Exception("Unable to see to end - 128 of " . $file, PEAR_MP3_ID_RE);
