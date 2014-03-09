@@ -1,7 +1,7 @@
 <?php
 //
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PHP Version 5                                                        |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
@@ -28,8 +28,6 @@
 // Uncomment the following define if you want tons of debugging info.
 // Tip: make sure you use a <PRE> block so the print_r's are readable.
 // define('ID3_SHOW_DEBUG', true);
-
-require_once "PEAR.php";
 
 /**
  * File not opened
@@ -336,9 +334,8 @@ class MP3_Id
      * @param string    $study  study the mpeg frame to get extra info like bitrate and frequency
      *                          You should avoid studying a lot of files as it will significantly
      *                          slow this down.
-     * @access public
      */
-    function MP3_Id($study = false)
+    public function __construct($study = false)
     {
         if (defined('ID3_SHOW_DEBUG')) {
             $this->debug = true;
@@ -351,11 +348,8 @@ class MP3_Id
      * reads the given file and parse it
      *
      * @param    string  $file the name of the file to parse
-     *
-     * @return   mixed   PEAR_Error on error
-     * @access   public
      */
-    function read($file = "")
+    public function read($file = "")
     {
         if ($this->debug) {
             print($this->debugbeg . "id3('$file')<HR>\n");
@@ -424,11 +418,8 @@ class MP3_Id
      *       parameters.
      *
      * @param boolean $v1   if true update/create an id3v1 tag on the file. (defaults to true)
-     *
-     * @return   mixed   PEAR_Error on error
-     * @access public
      */
-    function write($v1 = true)
+    public function write($v1 = true)
     {
         if ($this->debug) {
             print($this->debugbeg . "write()<HR>\n");
@@ -445,11 +436,8 @@ class MP3_Id
 
     /**
      * study() - does extra work to get the MPEG frame info.
-     *
-     * @return mixed PEAR_Error when fails
-     * @access public
      */
-    function study()
+    public function study()
     {
         $this->studied = true;
         return $this->_readframe();
@@ -459,10 +447,8 @@ class MP3_Id
      * copy($from) - set's the ID3 fields to the same as the fields in $from
      *
      * @param MP3_Id    $from   fields to copy
-     *
-     * @access public
      */
-    function copy($from)
+    public function copy($from)
     {
         if ($this->debug) {
             print($this->debugbeg . "copy(\$from)<HR>\n");
@@ -485,11 +471,8 @@ class MP3_Id
      *
      * @param boolean   $id3v1  true to remove the tag
      * @param boolean   $id3v2  true to remove the tag (Not yet implemented)
-     *
-     * @return mixed    PEAR_Error if fails
-     * @access public
      */
-    function remove($id3v1 = true, $id3v2 = true)
+    public function remove($id3v1 = true, $id3v2 = true)
     {
         if ($this->debug) {
             print($this->debugbeg . "remove()<HR>\n");
@@ -518,7 +501,6 @@ class MP3_Id
      * $file should be the path to the mp3 to look for a tag.
      * When in doubt use the full path.
      *
-     * @return mixed    PEAR_Error if fails
      * @access private
      */
     function _read_v1()
@@ -528,11 +510,11 @@ class MP3_Id
         }
 
         if (!($f = @fopen($this->file, 'rb'))) {
-            return PEAR::raiseError("Unable to open " . $this->file, PEAR_MP3_ID_FNO);
+            throw new MP3_Exception("Unable to open " . $this->file, PEAR_MP3_ID_FNO);
         }
 
         if (fseek($f, -128, SEEK_END) == -1) {
-            return PEAR::raiseError('Unable to see to end - 128 of ' . $this->file, PEAR_MP3_ID_RE);
+            throw new MP3_Exception('Unable to see to end - 128 of ' . $this->file, PEAR_MP3_ID_RE);
         }
 
         $r = fread($f, 128);
@@ -542,35 +524,34 @@ class MP3_Id
             $unp = unpack('H*raw', $r);
             print_r($unp);
         }
-
+    
         $id3tag = $this->_decode_v1($r);
+    
+        $this->id3v1 = true;
 
-        if (!PEAR::isError($id3tag)) {
-            $this->id3v1 = true;
+        $tmp = explode(chr(0), $id3tag['NAME']);
+        $this->name = $tmp[0];
 
-            $tmp = explode(chr(0), $id3tag['NAME']);
-            $this->name = $tmp[0];
+        $tmp = explode(chr(0), $id3tag['ARTISTS']);
+        $this->artists = $tmp[0];
 
-            $tmp = explode(chr(0), $id3tag['ARTISTS']);
-            $this->artists = $tmp[0];
+        $tmp = explode(chr(0), $id3tag['ALBUM']);
+        $this->album = $tmp[0];
 
-            $tmp = explode(chr(0), $id3tag['ALBUM']);
-            $this->album = $tmp[0];
+        $tmp = explode(chr(0), $id3tag['YEAR']);
+        $this->year = $tmp[0];
 
-            $tmp = explode(chr(0), $id3tag['YEAR']);
-            $this->year = $tmp[0];
+        $tmp = explode(chr(0), $id3tag['COMMENT']);
+        $this->comment = $tmp[0];
 
-            $tmp = explode(chr(0), $id3tag['COMMENT']);
-            $this->comment = $tmp[0];
-
-            if (isset($id3tag['TRACK'])) {
-                $this->id3v11 = true;
-                $this->track = $id3tag['TRACK'];
-            }
-
-            $this->genreno = $id3tag['GENRENO'];
-            $this->genre = $id3tag['GENRE'];
+        if (isset($id3tag['TRACK'])) {
+            $this->id3v11 = true;
+            $this->track = $id3tag['TRACK'];
         }
+
+        $this->genreno = $id3tag['GENRENO'];
+        $this->genre = $id3tag['GENRE'];
+    
 
         if ($this->debug) {
             print($this->debugend);
@@ -588,9 +569,8 @@ class MP3_Id
      * @param   string  $rawtag    tag to decode
      *
      * @return  mixed    returns PEAR_Error when fails or decoded tag
-     * @access  private
      */
-    function _decode_v1($rawtag)
+    protected function _decode_v1($rawtag)
     {
         if ($this->debug) {
             print($this->debugbeg . "_decode_v1(\$rawtag)<HR>\n");
@@ -612,7 +592,7 @@ class MP3_Id
         if ($id3tag['TAG'] == 'TAG') {
             $id3tag['GENRE'] = $this->getgenre($id3tag['GENRENO']);
         } else {
-            $id3tag = PEAR::raiseError('TAG not found', PEAR_MP3_ID_TNF);
+            throw new MP3_Exception('TAG not found', PEAR_MP3_ID_TNF);
         }
         if ($this->debug) {
             print($this->debugend);
@@ -626,9 +606,8 @@ class MP3_Id
      * writes a ID3 v1 or v1.1 tag to a file
      *
      * @return mixed    returns PEAR_Error when fails
-     * @access private
      */
-    function _write_v1()
+    protected function _write_v1()
     {
         if ($this->debug) {
             print($this->debugbeg . "_write_v1()<HR>\n");
@@ -637,12 +616,11 @@ class MP3_Id
         $file = $this->file;
 
         if (!($f = @fopen($file, 'r+b'))) {
-            return PEAR::raiseError("Unable to open " . $file, PEAR_MP3_ID_FNO);
+            throw new MP3_Exception("Unable to open " . $file, PEAR_MP3_ID_FNO);
         }
 
         if (fseek($f, -128, SEEK_END) == -1) {
-//        $this->error = 'Unable to see to end - 128 of ' . $file;
-            return PEAR::raiseError("Unable to see to end - 128 of " . $file, PEAR_MP3_ID_RE);
+            throw new MP3_Exception("Unable to see to end - 128 of " . $file, PEAR_MP3_ID_RE);
         }
 
         $this->genreno = $this->getgenreno($this->genre, $this->genreno);
@@ -651,19 +629,20 @@ class MP3_Id
 
         $r = fread($f, 128);
 
-        if (!PEAR::isError($this->_decode_v1($r))) {
+        try {
+            $this->_decode_v1($r)
+
             if (fseek($f, -128, SEEK_END) == -1) {
-//        $this->error = 'Unable to see to end - 128 of ' . $file;
-                return PEAR::raiseError("Unable to see to end - 128 of " . $file, PEAR_MP3_ID_RE);
+                throw new MP3_Exception("Unable to see to end - 128 of " . $file, PEAR_MP3_ID_RE);
             }
-        } else {
+        } catch (MP3_Exception $e) {
             if (fseek($f, 0, SEEK_END) == -1) {
-//        $this->error = 'Unable to see to end of ' . $file;
-                return PEAR::raiseError("Unable to see to end of " . $file, PEAR_MP3_ID_RE);
+                throw new MP3_Exception("Unable to see to end of " . $file, PEAR_MP3_ID_RE);
             }
         }
+
         if (fwrite($f, $newtag) === false) {
-            return PEAR::raiseError("Unable to write " . $file, PEAR_MP3_ID_RE);
+            throw new MP3_Exception("Unable to write " . $file, PEAR_MP3_ID_RE);
         }
         fclose($f);
 
@@ -678,9 +657,8 @@ class MP3_Id
      * the newly built tag will be returned
      *
      * @return string the new tag
-     * @access private
      */
-    function _encode_v1()
+    protected function _encode_v1()
     {
         if ($this->debug) {
             print($this->debugbeg . "_encode_v1()<HR>\n");
@@ -734,10 +712,9 @@ class MP3_Id
      * returns true if the tag was removed or none was found
      * else false if there was an error
      *
-     * @return mixed PEAR_Error when fails
-     * @access private
+     * @throws MP3_Exception
      */
-    function _remove_v1()
+    protected function _remove_v1()
     {
         if ($this->debug) {
             print($this->debugbeg . "_remove_v1()<HR>\n");
@@ -746,30 +723,32 @@ class MP3_Id
         $file = $this->file;
 
         if (!($f = fopen($file, 'r+b'))) {
-            return PEAR::raiseError("Unable to open " . $file, PEAR_MP3_ID_FNO);
+            throw new MP3_Exception("Unable to open " . $file, PEAR_MP3_ID_FNO);
         }
 
         if (fseek($f, -128, SEEK_END) == -1) {
-            return PEAR::raiseError('Unable to see to end - 128 of ' . $file, PEAR_MP3_ID_RE);
+            throw new MP3_Exception('Unable to see to end - 128 of ' . $file, PEAR_MP3_ID_RE);
         }
 
         $r = fread($f, 128);
 
-        $result = $this->_decode_v1($r);
-        if (!PEAR::isError($result)) {
+        try {
+            $result = $this->_decode_v1($r);
+        
             $size = filesize($this->file) - 128;
             if ($this->debug) {
                 print('size: old: ' . filesize($this->file));
             }
             if (!ftruncate($f, $size)) {
-                return PEAR::raiseError('Unable to truncate ' . $file, PEAR_MP3_ID_RE);
+                throw new MP3_Exception('Unable to truncate ' . $file, PEAR_MP3_ID_RE);
             }
             clearstatcache();
             if ($this->debug) {
                 print(' new: ' . filesize($this->file));
             }
+        } catch (MP3_Exception $e) {
+            fclose($f);
         }
-        fclose($f);
 
         if ($this->debug) {
             print($this->debugend);
@@ -781,10 +760,9 @@ class MP3_Id
     /**
      * reads a frame from the file
      *
-     * @return mixed PEAR_Error when fails
-     * @access private
+     * @throws MP3_Exception
      */
-    function _readframe()
+    protected function _readframe()
     {
         if ($this->debug) {
             print($this->debugbeg . "_readframe()<HR>\n");
@@ -797,7 +775,7 @@ class MP3_Id
                 print($this->debugend);
             }
 
-            return PEAR::raiseError("Unable to open " . $file, PEAR_MP3_ID_FNO);
+            throw new MP3_Exception("Unable to open " . $file, PEAR_MP3_ID_FNO);
         }
 
         $this->filesize = filesize($file);
@@ -812,7 +790,7 @@ class MP3_Id
                         print($this->debugend);
                     }
 
-                    return PEAR::raiseError("No mpeg frame found", PEAR_MP3_ID_NOMP3);
+                    throw new MP3_Exception("No mpeg frame found", PEAR_MP3_ID_NOMP3);
                 }
             }
             fseek($f, ftell($f) - 1); // back up one byte
