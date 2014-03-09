@@ -1,7 +1,7 @@
 <?php
 require 'MP3/Id.php';
 
-$mp3 = new MP3_Id();
+$mp3 = new MP3_Id(true);
 
 $data = $mp3->read(dirname(__FILE__) . '/test.mp3');
 
@@ -24,3 +24,4 @@ foreach ($expected as $key => $value) {
     var_dump($data[$key]);
   }
 }
+var_dump($data);
